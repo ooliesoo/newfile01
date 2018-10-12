@@ -77,6 +77,10 @@ secret 值设定
 //2.创建ceph文件系统  ,创建存储空间
 //使用前面创建的池，创建文件系统  
 [root@node4 ~]# ceph mds stat   //查看mds状态
-
-
+[root@node4 ~]# ceph fs new myfs1 cephfs_metadata cephfs_data  //创建文件系统myfs1
+[root@node4 ~]# ceph fs ls
+name: myfs1, metadata pool: cephfs_metadata, data pools: [cephfs_data ]
+//3.客户端挂载，linux内核支持ceph文件系统（不需要装软件）
+[root@client ~]# mount -t ceph 192.168.4.51:6789:/ /mnt/cephfs/ -o name=admin,secret=AQDovb5b2M2iLRAAWKESpCBc5971DlSHyNQ74g==
+//文件系统类型为ceph，192.168.4.51为mon节点的ip（不是mds节点的ip），admin是用户名，secret是密钥。/etc/ceph/ceph.client.admin.keyring
 
