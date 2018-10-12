@@ -57,4 +57,26 @@ secret 值设定
 //2.定义一个虚拟机
 [root@room9pc01 ~]# virsh define /tmp/avpc1.xml
 //3.验证   
+-------------------------------------------------------------------
+//分布式文件系统CephFS
+//MDS  MateData  对象存储
+//环境准备：client，node1-3 mon,osd ,node4  MDS节点
+一、部署元数据服务器
+//1.登陆node4，安装ceph-mds软件包
+[root@node4 ~]# yum -y install ceph-mds
+//2.登陆node1部署节点操作
+[root@node1 ~]# cd /root/ceph-cluster/
+[root@node1 ceph-cluster]# ceph-deploy mds create node4   //给node4拷贝配置文件，启动mds服务
+//3.同步配置文件和key
+[root@node1 ceph-cluster]# ceph-deploy admin node4
+二、文件系统服务器
+//1.创建存储池，文件系统需要至少2个池，一个池用于存储数据，一个池用于存储元数据。
+[root@node4 ~]# ceph osd pool create cephfs_data 128   //128个文件夹
+[root@node4 ~]# ceph osd pool create cephfs_metadata 128
+[root@node4 ~]# ceph osd lspools
+//2.创建ceph文件系统  ,创建存储空间
+//使用前面创建的池，创建文件系统  
+[root@node4 ~]# ceph mds stat   //查看mds状态
+
+
 
