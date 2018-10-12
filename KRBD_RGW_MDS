@@ -11,8 +11,9 @@ qemu-img info rbd:rbd/vm1-image
 //客户端部署，客户端需要安装ceph-common软件包
 //拷贝配置文件（否则不知道集群在哪）
 //拷贝连接密钥（否则无连接权限）
-[root@room9pc[root@room9pc01 ~]# scp 192.168.4.51:/etc/ceph/ceph.conf /etc/ceph/
-[root@room9pc01 ~]# scp 192.168.4.51:/etc/ceph/ceph.client.admin.keyring /etc/ceph/01 ~]# yum -y install ceph-common.x86_64
+[root@room9pc01 ~]# yum -y install ceph-common.x86_64
+[root@room9pc01 ~]# scp 192.168.4.51:/etc/ceph/ceph.client.admin.keyring /etc/ceph/
+[root@room9pc01 ~]# scp 192.168.4.51:/etc/ceph/ceph.conf /etc/ceph/
 [root@room9pc01 ~]# ls /etc/ceph/
 //在真机上创建一台新的虚拟机，创建好后不需要安转操作系统
 ------------------------------------------------------------------------------
