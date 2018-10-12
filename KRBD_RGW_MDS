@@ -16,4 +16,45 @@ qemu-img info rbd:rbd/vm1-image
 [root@room9pc01 ~]# ls /etc/ceph/
 //在真机上创建一台新的虚拟机，创建好后不需要安转操作系统
 ------------------------------------------------------------------------------
-配置libvirt secret 设置账户信息                 //kvm用来连接ceph的工具，需要用户名和密码
+//二、配置libvirt secret 设置账户信息                 //kvm用来连接ceph的工具，需要用户名和密码
+//1.编写账户信息
+[root@room9pc01 ~]# vim secret.xml
+<secret ephemeral='no' private='no'>
+        <usage type='ceph'>
+                <name>client.admin secret</name>
+        </usage>
+</secret>
+//2.使用XML配置文件创建secret，生成UUID
+[root@room9pc01 ~]# virsh secret-define --file /root/secret.xml
+//删除UUID
+[root@room9pc01 ~]# virsh secret-undefine f25b406f-78cd-441e-8b7d-abde5010090a
+//3.编写账户信息（获取client.admin的key，或者直接查看密钥）
+[root@room9pc01 ~]# ceph auth get-key client.admin
+[root@room9pc01 ~]# cat /etc/ceph/ceph.client.admin.keyring
+//4.设置secret，添加账户的密钥
+//这里secret后面是之前创建的secret的uuid，base64后面时client.admin账户的密钥
+[root@room9pc01 ~]# virsh secret-set-value --secret f25b406f-78cd-441e-8b7d-abde5010090a --base64 AQDovb5b2M2iLRAAWKESpCBc5971DlSHyNQ74g==
+secret 值设定
+-------------------------------------------------------------------------
+三、虚拟机XML配置文件
+//1、修改虚拟机的配置文件
+//使用图形管理工具创建的虚拟文件，定义一个新的虚拟机
+[root@room9pc01 ~]# virsh dumpxml avpc > /tmp/avpc1.xml
+ vim /tmp/avpc1.xml   //建议备份一下
+
+ 32     <disk type='network' device='disk'>
+ 33       <driver name='qemu' type='raw'/>
+ 34       <auth username='admin'>
+ 35         <secret type='ceph' uuid='f25b406f-78cd-441e-8b7d-abde5010090a'/>
+ 36       </auth>
+ 37 
+ 38       <source protocol='rbd' name='rbd/vm1-image'>
+ 39         <host name='192.168.4.51' port='6789'/>
+ 40       </source>
+ 41
+ 42       <target dev='vda' bus='virtio'/>
+ 43       <address type='pci' domain='0x0000' bus='0x00' slot='0x07' function='0x0'/>
+//2.定义一个虚拟机
+[root@room9pc01 ~]# virsh define /tmp/avpc1.xml
+//3.验证   
+
