@@ -136,4 +136,58 @@ delete from 表名 where 条件表达式；
 mysql> delete from t3 where id=45;
 格式2，删除所有的表
 delete from 表名；
+四、匹配条件
+（1）、基本匹配条件
+数值比较：字段类型必须数据数值类型
+=   >   >=   <    <=   !=
+字符比较/匹配空/非空：字段类型必须是字符类型      //先做与再做或
+=   !=   IS NULL    IS NOT NULL
+mysql> select * from t3 where homedir is null;
+逻辑匹配：多个判断条件时使用
+OR  AND   ! /not  非     （）提高优先级
+mysql> select  * from t3 where uid=0 and name="root";
+mysql> select  * from t3 where id=3 or id=4;
+mysql> select name,id from t3 where (name="root" or name="bin") and uid=3;
+mysql> select name,id from t3 where name="root" or name="bin" and uid=3;
+范围内匹配/去重显示
+in (值列表)、 not in (值列表)、 between 数字1 and 数字2 、 distinct 字段名
+mysql> select name from t3 where name in ("apache","daemon","mysql","adm");
+mysql> select name from t3 where id between 3 and 6;
+mysql> select distinct shell from t3 ;
+（2）高级匹配条件
+模糊查询
+基本用法：where 字段名 like ‘通配符’，_匹配单个字符、%匹配0～N个字符
+mysql> select * from t3 where name like "r%";
+mysql> select * from t3 where name like "r__t";
+mysql> select * from t3 where name like '__%__';
+正则表达式
+基本用法：where 字段名 regexp ‘正则表达式’
+- 正则元字符  ^  $  .  []  *  | 
+mysql> select name  from t3 where name regexp '[0-9]';
+mysql> select * from t3 where name regexp '^r|3$';
+mysql> select * from t3 where name regexp '.*';
+四则运算：字段必须是数值类型    + - * / %
+mysql> alter table t3 add age tinyint(2) unsigned default 19 after name;
+mysql> select name,age,2018-age birth from t3 where name="root";
+（3）操作查询结果
+聚集函数，mysql内置数据统计函数
+- avg，sum，min，max，count
+mysql> select max(uid),min(uid),sum(uid),avg(uid),count(name) from t3;
+查询结果排序
+基本用法：SQL查询 order by 字段名(通常是数值类型字段) [asc|desc];
+mysql> select id,name from t3 where name regexp '^r' order by id desc;
+查询结果分组
+基本用法：-SQL查询 group by 字段名（通常是字符类型字段）；
+
+查询结果过滤
+基本用法
+- SQL查询 having 条件表达式
+- SQL查询 where 条件 having 条件表达式；
+- SQL查询 group by 字段名 having 条件表达式；
+
+限制查询结果显示行数
+SQL查询 limit N； 		//显示查询结果前N条记录
+SQL查询 limit N,M 		//显示指定范围内的查询记录
+SQL查询 where 条件查询 limit 3;	//显示查询结果前3条记录
+SQL查询 where 条件查询 limit 3,3;
 
