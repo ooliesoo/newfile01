@@ -46,7 +46,7 @@ mysql> rollback;
 mysql> commit;
 查询操作多的表适合使用myisam存储引擎，可以节省系统资源；
 写操作多的表适合使用innodb存储引擎，可以加大并发访问量
-
+--------------------------------------------------------------------------------
 二、数据导入导出
 （1）、数据导入
 mysql> show variables like "secure_file_priv";
@@ -56,7 +56,7 @@ Mysql> system ls /etc/passwd
 基本用法
 - load data infile “目录名/文件名”
 Into table 表名 fields terminated by “分隔符” lines terminated by “\n”;
-
+--------------------------------------------------------------------------------
 mysql> create table t3( 
     -> name char(50),
     -> password char(1),
@@ -66,14 +66,14 @@ mysql> create table t3(
     -> homedir varchar(100),
     -> shell char(30)
 -> );
-
+--------------------------------------------------------------------------------
 mysql> load data infile "/var/lib/mysql-files/passwd"
     -> into table t3
     -> fields terminated by ":"
     -> lines terminated by "\n";
     
 mysql> alter table t3 add id int(2) primary key auto_increment first;
-
+--------------------------------------------------------------------------------
 修改目录及查看修改结果
 [root@client ~]# setenforce 0
 [root@client ~]# mkdir /mydir
@@ -82,7 +82,7 @@ mysql> alter table t3 add id int(2) primary key auto_increment first;
 [mysql]
 secure_file_priv=/mydir
 mysql> show variables like "secure_file_priv";
-
+--------------------------------------------------------------------------------
 （2）、数据导出
 基本用法
 - SQL查询into outfile “目录名/文件名”
@@ -92,7 +92,7 @@ mysql> select * from t22 into outfile "/mydir/testip"
     -> fields terminated by "   "
     -> lines terminated by "\n";
 [root@client ~]# cat /mydir/testip
-
+--------------------------------------------------------------------------------
 三、管理表记录
 （1）、添加表记录
 格式一：添加一条记录，给所有字段赋值
@@ -112,6 +112,7 @@ mysql> insert into t3(name,password,shell)
 Values
 ("lisi","x","/bin/bash"),
 ("zhangsan","x","/bin/false");
+------------------------------------------------------------------------
 （2）查询表记录
 语法格式
 格式1： select 字段1,...,字段N from 表名;
@@ -121,4 +122,18 @@ mysql> select id,name,shell from t3 where shell="/bin/bash";
 将显示的字段名起别名
 select 字段1 字段1别名  from 表名;
 mysql> select id user_id,name username from t3;
+-------------------------------------------------------------------------
+（3）更新表记录
+格式1，更新表内的所有记录
+update 表名 set 字段1=字段1值,字段2=字段2值; 
+格式2，只更新符合条件的部分记录
+update 表名 set 字段1=字段1值,字段2=字段2值 where 条件表达式;
+mysql> update t3 set password="a",comment="student";
+-------------------------------------------------------------------------
+（4）删除表记录
+格式1：仅删除符合条件的记录
+delete from 表名 where 条件表达式；
+mysql> delete from t3 where id=45;
+格式2，删除所有的表
+delete from 表名；
 
