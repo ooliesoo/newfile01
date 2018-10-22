@@ -77,7 +77,7 @@ mysql> flush logs；				//手动生成新日志方法，默认往最大编号的
 mysql> purge master logs to “binlog文件名”；//删除早于指定版本的binlog日志
 mysql> reset master;  //删除日志文件
 
-++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 方法二：使用innobackupex命令实现增量备份和恢复
 物理备份缺点：跨平台性差，备份时间长、冗余备份、浪费存储空间
 Mysqldump备份缺点：效率较低，备份和还原速度慢，备份过程中，数据插入和更新操作会被挂起。
@@ -124,6 +124,30 @@ mysql> insert into a values(25);				  //完全备份
 [root@client ~]# rm -rf /newdir /newdir2
 [root@client ~]# chown -R mysql:mysql /var/lib/mysql
 [root@client ~]# systemctl restart mysqld
+==========================================================================================================
+1、在完全备份文件中恢复单个表
+mysql> show tables;
+2、对db5库做完全备份
+[root@client ~]# innobackupex --user root --password qwerDF1234. --database="db5" /db5bak --no-timestamp
+3、查看备份信息
+[root@client ~]# cat /db5bak/xtrabackup_checkpoints
+4、删除db5库里的a表
+mysql> drop table a;
+5、恢复时需要创建回表结构
+mysql> create table a(id int);
+6、恢复单个表
+(1)、删除表空间:
+mysql> alter table db5.a discard tablespace;
+(2)、--export  导出表信息并拷贝到数据库目录下
+[root@client ~]# innobackupex --user root --password qwerDF1234. --database="db5" --apply-log --export /db5bak
+[root@client ~]# cp /db5bak/db5/a.{ibd,cfg,exp} /var/lib/mysql/db5/
+[root@client ~]# chown  mysql:mysql /var/lib/mysql/db5/a.*
+(3)、导入表空间:
+mysql> alter table db5.a import tablespace;
+(4)、验证
+mysql> select * from a;
+[root@client ~]# rm -rf /var/lib/mysql/db5/a.{cfg,exp}
+[root@client ~]# ls /var/lib/mysql/db5/
 
 
 
