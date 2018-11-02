@@ -1,0 +1,11 @@
+系统日志syslog
+系统日志的守护进程rsyslog
+相关的配置文件 /etc/rsyslog.conf  /rsyncd.conf
+规则（选择器+动作）
+selector部分指定源和日志优先级
+action日志等级 8个级别             //none代表空
+样例： cron.* /var/log/cron     //将所有来自cron守护进程的消息保存到var/log/cron文件中  ；隔开多个级别
+mail.=info    //强制记录某一级别
+mail.!info    //排除这类级别的日志信息
+logger --help
+logger -p cron.info  -t ooxx  'xiixhaha'       //  手动发送日志文件
